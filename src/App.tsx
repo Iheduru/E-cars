@@ -26,6 +26,15 @@ import ServiceProvider from './pages/ServiceProvider';
 import StolenCars from './pages/StolenCars';
 import Dealership from './pages/Dealership';
 import Blacklist from './pages/Blacklist';
+import ManageCars from './pages/dashboard/ManageCars';
+import UploadCar from './pages/dashboard/UploadCars';
+import Settings from './pages/dashboard/Settings';
+import Notifications from './pages/dashboard/Notifications';
+import UserManagement from './pages/dashboard/admin/UserManagement';
+import ReportsAndFlags from './pages/dashboard/admin/ReportsAndFlags';
+import ContentManagement from './pages/dashboard/admin/ContentManagement';
+import Analytics from './pages/dashboard/admin/Analytics';
+import DealerDetails from './pages/DealerDetails';
 
 function App() {
   const location = useLocation();
@@ -55,6 +64,7 @@ function App() {
         <Route path="stolen-cars" element={<StolenCars />} />
         <Route path="dealerships" element={<Dealership />} />
         <Route path="blacklist" element={<Blacklist />} />
+        <Route path="/dealers/:id" element={<DealerDetails />} />
 
         {/* Protected Routes */}
         <Route path="dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
@@ -62,6 +72,18 @@ function App() {
           <Route path="listings" element={<MyListings />} />
           <Route path="profile" element={<ProfileSettings />} />
           <Route path="messages" element={<Messages />} />
+          <Route path="manage-cars" element={<ManageCars />} />
+          <Route path="upload" element={<UploadCar />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="notifications" element={<Notifications />} />
+          
+          {/* Admin Routes 
+          <Route path="admin">
+            <Route path="users" element={<PrivateRoute adminOnly><UserManagement /></PrivateRoute>} />
+            <Route path="reports" element={<PrivateRoute adminOnly><ReportsAndFlags /></PrivateRoute>} />
+            <Route path="content" element={<PrivateRoute adminOnly><ContentManagement /></PrivateRoute>} />
+            <Route path="analytics" element={<PrivateRoute adminOnly><Analytics /></PrivateRoute>} />
+          </Route>*/}
         </Route>
         
         {/* Catch-all route */}

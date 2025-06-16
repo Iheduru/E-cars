@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Truck, Clock, ThumbsUp, AlertTriangle, FileText, Car } from 'lucide-react';
 import { CarData, CarCard } from '../components/car/CarCard';
 import SearchFilters from '../components/car/SearchFilters';
+import { featuredDealers } from '../data/dealers';
 
 // Mock data
 const featuredCars: CarData[] = [
@@ -107,6 +108,17 @@ const newestListings: CarData[] = [
     imageUrl: 'https://images.pexels.com/photos/544542/pexels-photo-544542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
   },
 ];
+
+
+
+interface Dealer {
+  id: string;
+  name: string;
+  location: string;
+  brands: string[];
+  rating: number;
+  imageUrl: string;
+}
 
 const Home = () => {
   const [searchParams, setSearchParams] = useState({});
@@ -321,6 +333,64 @@ const Home = () => {
                 7-day money-back guarantee if you're not completely satisfied.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+            {/* Car Dealers Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Featured Dealers</h2>
+            <Link to="/dealerships" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>View all dealers</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredDealers.map((dealer) => (
+              <div key={dealer.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={dealer.imageUrl} 
+                    alt={dealer.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{dealer.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{dealer.location}</p>
+                  
+                  <div className="flex items-center mb-3">
+                    <div className="flex text-yellow-400 mr-2">
+                      {[...Array(5)].map((_, i) => (
+                        <svg
+                          key={i}
+                          className={`w-4 h-4 ${i < Math.floor(dealer.rating) ? 'fill-current' : 'fill-none stroke-current'}`}
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                        >
+                          <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{dealer.rating.toFixed(1)}</span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {dealer.brands.map((brand, index) => (
+                      <span 
+                        key={index}
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded-full"
+                      >
+                        {brand}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

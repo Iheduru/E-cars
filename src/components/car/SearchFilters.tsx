@@ -49,6 +49,26 @@ const vehicleTypeOptions: FilterOption[] = [
   { value: 'van', label: 'Van/Minivan' },
 ];
 
+const locationTypeOptions: FilterOption[] = [
+  { value: '', label: 'Any Location' },
+  { value: 'new-york', label: 'New York' },
+  { value: 'los-angeles', label: 'Los Angeles' },
+  { value: 'chicago', label: 'Chicago' },
+  { value: 'houston', label: 'Houston' },
+  { value: 'miami', label: 'Miami' },
+  { value: 'san-francisco', label: 'San Francisco' },
+  { value: 'seattle', label: 'Seattle' },
+  { value: 'boston', label: 'Boston' },
+  { value: 'dallas', label: 'Dallas' },
+  { value: 'washington-dc', label: 'Washington D.C.' },
+  { value: 'philadelphia', label: 'Philadelphia' },
+  { value: 'atlanta', label: 'Atlanta' },
+  { value: 'phoenix', label: 'Phoenix' },
+  { value: 'denver', label: 'Denver' },
+  { value: 'las-vegas', label: 'Las Vegas' },
+  { value: 'orlando', label: 'Orlando' },
+];
+
 interface SearchFiltersProps {
   variant?: 'hero' | 'sidebar';
   className?: string;
@@ -61,6 +81,7 @@ export interface SearchFilters {
   year: string;
   vehicleType: string;
   keywords: string;
+  locationType: string;
 }
 
 const SearchFilters = ({ 
@@ -74,6 +95,7 @@ const SearchFilters = ({
     year: '',
     vehicleType: '',
     keywords: '',
+    locationType: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -90,7 +112,7 @@ const SearchFilters = ({
     return (
       <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 ${className}`}>
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             {/* Make */}
             <div className="relative">
               <label htmlFor="make" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -182,6 +204,30 @@ const SearchFilters = ({
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
               </div>
             </div>
+
+            {/* Location Type */}
+            <div>
+              <label htmlFor="locationType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Location
+              </label>
+              <div className="relative">
+                <select
+                  id="locationType"
+                  name="locationType"
+                  value={filters.locationType}
+                  onChange={handleChange}
+                  className="input appearance-none"
+                >
+                  {locationTypeOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+              </div>
+            </div>
+
 
             {/* Search Button */}
             <div className="flex items-end">
