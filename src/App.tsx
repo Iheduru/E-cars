@@ -35,6 +35,9 @@ import ReportsAndFlags from './pages/dashboard/admin/ReportsAndFlags';
 import ContentManagement from './pages/dashboard/admin/ContentManagement';
 import Analytics from './pages/dashboard/admin/Analytics';
 import DealerDetails from './pages/DealerDetails';
+import ValueAsset from './pages/ValueAsset';
+import Auctions from './pages/Auctions';
+import AuctionDetails from './pages/AuctionDetails';
 
 function App() {
   const location = useLocation();
@@ -65,6 +68,11 @@ function App() {
         <Route path="dealerships" element={<Dealership />} />
         <Route path="blacklist" element={<Blacklist />} />
         <Route path="/dealers/:id" element={<DealerDetails />} />
+        <Route path="/value-asset" element={<ValueAsset />} />
+        <Route path="/auctions" element={<Auctions />} />
+        <Route path="auctions/:id" element={<AuctionDetails />} />
+        
+        {/* Dashboard and User Routes */}
 
         {/* Protected Routes */}
         <Route path="dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>

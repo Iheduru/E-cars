@@ -96,7 +96,7 @@ export const CarCard = ({ car, showDealerInfo = false }: CarCardProps) => {
           
           <div className="mb-3">
             <span className="text-xl font-bold text-primary-600 dark:text-primary-500">
-              ${car.price.toLocaleString()}
+              ₦{car.price.toLocaleString()}
             </span>
           </div>
           

@@ -12,9 +12,11 @@ import {
   Users,
   FileText,
   BarChart,
-  Bell
+  Bell,
+  ListChecks
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import Listings from '@/pages/Listings';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -28,11 +30,13 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   const menuItems = [
     { icon: Grid, label: 'Dashboard', path: '/dashboard' },
     { icon: Upload, label: 'Upload Cars', path: '/dashboard/upload' },
+    { icon: ListChecks, label: 'Listings', path: '/dashboard/listings' },
     { icon: Car, label: 'Manage Cars', path: '/dashboard/manage-cars' },
     { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
     { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
     { icon: User, label: 'Profile', path: '/dashboard/profile' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
+
   ];
 
   const adminMenuItems = [

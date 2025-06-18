@@ -1,137 +1,10 @@
 import { useState, useEffect } from 'react';
-import { CarData, CarCard } from '../components/car/CarCard';
+import { CarCard } from '../components/car/CarCard';
 import SearchFilters, { SearchFilters as FilterValues } from '../components/car/SearchFilters';
-import { ChevronDown, SlidersHorizontal, Grid3X3, Menu, Search } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, Search } from 'lucide-react';
+import { CarData, mockInventory } from '../data/cars';
 
-// Mock data for listings
-const allCars: CarData[] = [
-  {
-    id: '1',
-    title: '2022 Toyota Camry XSE',
-    price: 32500,
-    year: 2022,
-    mileage: 15000,
-    fuelType: 'Hybrid',
-    location: 'Phoenix, AZ',
-    imageUrl: 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '2',
-    title: '2020 Honda Accord Sport',
-    price: 27800,
-    year: 2020,
-    mileage: 32000,
-    fuelType: 'Gasoline',
-    location: 'Dallas, TX',
-    imageUrl: 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '3',
-    title: '2021 Tesla Model 3',
-    price: 42900,
-    year: 2021,
-    mileage: 18500,
-    fuelType: 'Electric',
-    location: 'San Francisco, CA',
-    imageUrl: 'https://images.pexels.com/photos/12318482/pexels-photo-12318482.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '4',
-    title: '2019 Ford F-150 Raptor',
-    price: 55000,
-    year: 2019,
-    mileage: 45000,
-    fuelType: 'Gasoline',
-    location: 'Denver, CO',
-    imageUrl: 'https://images.pexels.com/photos/2676447/pexels-photo-2676447.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '5',
-    title: '2018 BMW X5 xDrive',
-    price: 38700,
-    year: 2018,
-    mileage: 52000,
-    fuelType: 'Diesel',
-    location: 'Miami, FL',
-    imageUrl: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '6',
-    title: '2023 Audi e-tron GT',
-    price: 104000,
-    year: 2023,
-    mileage: 5000,
-    fuelType: 'Electric',
-    location: 'Seattle, WA',
-    imageUrl: 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '7',
-    title: '2021 Lexus RX 350',
-    price: 48000,
-    year: 2021,
-    mileage: 28000,
-    fuelType: 'Gasoline',
-    location: 'Chicago, IL',
-    imageUrl: 'https://images.pexels.com/photos/4072248/pexels-photo-4072248.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '8',
-    title: '2020 Subaru Outback',
-    price: 32000,
-    year: 2020,
-    mileage: 35000,
-    fuelType: 'Gasoline',
-    location: 'Portland, OR',
-    imageUrl: 'https://images.pexels.com/photos/9592962/pexels-photo-9592962.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '9',
-    title: '2019 Jeep Grand Cherokee',
-    price: 39500,
-    year: 2019,
-    mileage: 42000,
-    fuelType: 'Gasoline',
-    location: 'Denver, CO',
-    imageUrl: 'https://images.pexels.com/photos/544542/pexels-photo-544542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '10',
-    title: '2017 Mercedes-Benz C300',
-    price: 28900,
-    year: 2017,
-    mileage: 68000,
-    fuelType: 'Gasoline',
-    location: 'New York, NY',
-    imageUrl: 'https://images.pexels.com/photos/193999/pexels-photo-193999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '11',
-    title: '2022 Kia Telluride SX',
-    price: 44500,
-    year: 2022,
-    mileage: 12000,
-    fuelType: 'Gasoline',
-    location: 'Atlanta, GA',
-    imageUrl: 'https://images.pexels.com/photos/225841/pexels-photo-225841.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '12',
-    title: '2020 Hyundai Palisade',
-    price: 41200,
-    year: 2020,
-    mileage: 32000,
-    fuelType: 'Gasoline',
-    location: 'Tampa, FL',
-    imageUrl: 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-];
+const allCars: CarData[] = Object.values(mockInventory).flat();
 
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
@@ -148,16 +21,26 @@ const Listings = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<FilterValues>({
     make: '',
+    model: '',
     priceRange: '',
     year: '',
-    vehicleType: '',
+    bodyType: '',
     keywords: '',
+    location: '',
+    distance: '',
+    conditionType: '',
+    category: '',
+    mileage: '',
+    fuelType: '',
+    transmission: '',
+    sellerType: '',
+    doors: '',
+    engineSize: '',
+    colour: '',
   });
 
-  // Apply sorting
   useEffect(() => {
     const sortedCars = [...filteredCars];
-    
     switch (sortBy) {
       case 'newest':
         sortedCars.sort((a, b) => b.year - a.year);
@@ -177,25 +60,13 @@ const Listings = () => {
       default:
         break;
     }
-    
     setCars(sortedCars);
   }, [sortBy, filteredCars]);
 
-  // Handle search & filtering
   const handleSearch = (filters: FilterValues) => {
     setCurrentFilters(filters);
-    
-    // Apply filters (in a real app, this would likely be an API call)
     let results = [...allCars];
-    
-    // Filter by make
-    if (filters.make) {
-      results = results.filter(car => 
-        car.title.toLowerCase().includes(filters.make.toLowerCase())
-      );
-    }
-    
-    // Filter by price range
+
     if (filters.priceRange) {
       const [min, max] = filters.priceRange.split('-').map(Number);
       if (min && max) {
@@ -206,8 +77,7 @@ const Listings = () => {
         results = results.filter(car => car.price <= max);
       }
     }
-    
-    // Filter by year
+
     if (filters.year) {
       const [minYear, maxYear] = filters.year.split('-').map(Number);
       if (minYear && maxYear) {
@@ -218,23 +88,45 @@ const Listings = () => {
         results = results.filter(car => car.year <= maxYear);
       }
     }
-    
-    // Filter by keywords
+
     if (filters.keywords) {
       const keywords = filters.keywords.toLowerCase();
       results = results.filter(car => 
         car.title.toLowerCase().includes(keywords) || 
         car.location.toLowerCase().includes(keywords) ||
-        car.fuelType.toLowerCase().includes(keywords)
+        car.fuelType.toLowerCase().includes(keywords) ||
+        car.features.some(feature => feature.toLowerCase().includes(keywords))
       );
     }
-    
+
+    if (filters.location) {
+      results = results.filter(car => 
+        car.location.toLowerCase().includes(filters.location.toLowerCase())
+      );
+    }
+
+    if (filters.fuelType) {
+      results = results.filter(car => 
+        car.fuelType.toLowerCase() === filters.fuelType.toLowerCase()
+      );
+    }
+
+    if (filters.mileage) {
+      const [minMileage, maxMileage] = filters.mileage.split('-').map(Number);
+      if (minMileage && maxMileage) {
+        results = results.filter(car => car.mileage >= minMileage && car.mileage <= maxMileage);
+      } else if (minMileage) {
+        results = results.filter(car => car.mileage >= minMileage);
+      } else if (maxMileage) {
+        results = results.filter(car => car.mileage <= maxMileage);
+      }
+    }
+
     setFilteredCars(results);
   };
 
   return (
     <div className="pt-16 min-h-screen">
-      {/* Page Header */}
       <div className="bg-primary-600 dark:bg-primary-800 py-12">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold text-white mb-4">Browse Cars</h1>
@@ -246,7 +138,6 @@ const Listings = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="lg:flex">
-          {/* Sidebar Filters - Desktop */}
           <div className="hidden lg:block w-64 flex-shrink-0 mr-8">
             <div className="sticky top-24">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Filters</h2>
@@ -257,7 +148,6 @@ const Listings = () => {
             </div>
           </div>
 
-          {/* Mobile Filter Button */}
           <div className="lg:hidden mb-4 flex items-center justify-between">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -283,7 +173,6 @@ const Listings = () => {
             </div>
           </div>
 
-          {/* Mobile Filters Panel */}
           {showFilters && (
             <div className="lg:hidden mb-4">
               <SearchFilters 
@@ -293,15 +182,12 @@ const Listings = () => {
             </div>
           )}
 
-          {/* Main Content */}
           <div className="flex-1">
-            {/* Results Header */}
             <div className="hidden lg:flex items-center justify-between mb-6">
               <h2 className="text-gray-700 dark:text-gray-300">
                 <span className="font-semibold">{cars.length}</span> cars found
               </h2>
               
-              {/* Sort Dropdown */}
               <div className="relative">
                 <label htmlFor="sort" className="text-sm mr-2 text-gray-600 dark:text-gray-400">
                   Sort by:
@@ -322,7 +208,6 @@ const Listings = () => {
               </div>
             </div>
 
-            {/* Cars Grid */}
             {cars.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cars.map((car) => (
@@ -340,10 +225,22 @@ const Listings = () => {
                   onClick={() => {
                     setCurrentFilters({
                       make: '',
+                      model: '',
                       priceRange: '',
                       year: '',
-                      vehicleType: '',
+                      bodyType: '',
                       keywords: '',
+                      location: '',
+                      distance: '',
+                      conditionType: '',
+                      category: '',
+                      mileage: '',
+                      fuelType: '',
+                      transmission: '',
+                      sellerType: '',
+                      doors: '',
+                      engineSize: '',
+                      colour: '',
                     });
                     setFilteredCars(allCars);
                   }}
@@ -354,7 +251,6 @@ const Listings = () => {
               </div>
             )}
 
-            {/* Pagination - would be implemented with real data */}
             {cars.length > 0 && (
               <div className="mt-8 flex justify-center">
                 <nav className="inline-flex rounded-md shadow">

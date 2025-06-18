@@ -1,116 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Truck, Clock, ThumbsUp, AlertTriangle, FileText, Car } from 'lucide-react';
+import { ArrowRight, Shield, Truck, Clock, ThumbsUp, AlertTriangle, FileText, Car, X } from 'lucide-react';
 import { CarData, CarCard } from '../components/car/CarCard';
+import { getFeaturedCars } from '../data/cars';
 import SearchFilters from '../components/car/SearchFilters';
 import { featuredDealers } from '../data/dealers';
+import { mockInventory } from '../data/cars';
+import carBrands from '../data/brandData';
 
-// Mock data
-const featuredCars: CarData[] = [
-  {
-    id: '1',
-    title: '2022 Toyota Camry XSE',
-    price: 32500,
-    year: 2022,
-    mileage: 15000,
-    fuelType: 'Hybrid',
-    location: 'Phoenix, AZ',
-    imageUrl: 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '2',
-    title: '2020 Honda Accord Sport',
-    price: 27800,
-    year: 2020,
-    mileage: 32000,
-    fuelType: 'Gasoline',
-    location: 'Dallas, TX',
-    imageUrl: 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '3',
-    title: '2021 Tesla Model 3',
-    price: 42900,
-    year: 2021,
-    mileage: 18500,
-    fuelType: 'Electric',
-    location: 'San Francisco, CA',
-    imageUrl: 'https://images.pexels.com/photos/12318482/pexels-photo-12318482.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '4',
-    title: '2019 Ford F-150 Raptor',
-    price: 55000,
-    year: 2019,
-    mileage: 45000,
-    fuelType: 'Gasoline',
-    location: 'Denver, CO',
-    imageUrl: 'https://images.pexels.com/photos/2676447/pexels-photo-2676447.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '5',
-    title: '2018 BMW X5 xDrive',
-    price: 38700,
-    year: 2018,
-    mileage: 52000,
-    fuelType: 'Diesel',
-    location: 'Miami, FL',
-    imageUrl: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-  {
-    id: '6',
-    title: '2023 Audi e-tron GT',
-    price: 104000,
-    year: 2023,
-    mileage: 5000,
-    fuelType: 'Electric',
-    location: 'Seattle, WA',
-    imageUrl: 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    isFeatured: true,
-  },
-];
-
-const newestListings: CarData[] = [
-  {
-    id: '7',
-    title: '2021 Lexus RX 350',
-    price: 48000,
-    year: 2021,
-    mileage: 28000,
-    fuelType: 'Gasoline',
-    location: 'Chicago, IL',
-    imageUrl: 'https://images.pexels.com/photos/4072248/pexels-photo-4072248.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '8',
-    title: '2020 Subaru Outback',
-    price: 32000,
-    year: 2020,
-    mileage: 35000,
-    fuelType: 'Gasoline',
-    location: 'Portland, OR',
-    imageUrl: 'https://images.pexels.com/photos/9592962/pexels-photo-9592962.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '9',
-    title: '2019 Jeep Grand Cherokee',
-    price: 39500,
-    year: 2019,
-    mileage: 42000,
-    fuelType: 'Gasoline',
-    location: 'Denver, CO',
-    imageUrl: 'https://images.pexels.com/photos/544542/pexels-photo-544542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-];
-
-
-
+// Interface for Dealer (unchanged)
 interface Dealer {
   id: string;
   name: string;
@@ -122,11 +21,28 @@ interface Dealer {
 
 const Home = () => {
   const [searchParams, setSearchParams] = useState({});
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const handleSearch = (filters: any) => {
     setSearchParams(filters);
     console.log('Search filters:', filters);
   };
+
+  // Use getFeaturedCars for Featured Cars section
+  const featuredCars = getFeaturedCars();
+
+  // For Newest Listings, select recent cars from mockInventory, sorted by year
+  const newestListings = Object.values(mockInventory)
+    .flat()
+    .sort((a, b) => b.year - a.year)
+    .slice(0, 3);
+
+  // For Car Brands section, filter cars by selected brand
+  const brandCars = selectedBrand
+    ? Object.values(mockInventory)
+        .flat()
+        .filter((car) => car.make.toLowerCase() === selectedBrand.toLowerCase())
+    : [];
 
   return (
     <div className="min-h-screen">
@@ -272,72 +188,33 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredCars.slice(0, 6).map((car) => (
+            {featuredCars.slice(0, 6).map((car: CarData) => (
               <CarCard key={car.id} car={car} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-16 bg-white dark:bg-gray-800">
+      {/* Recent Listings */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose eCars?</h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              We make buying and selling cars simple, transparent, and stress-free with industry-leading features and service.
-            </p>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Newest Listings</h2>
+            <Link to="/cars" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>View all</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center">
-              <div className="bg-primary-100 dark:bg-primary-900 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Shield className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Verified Listings</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                All cars are verified for quality and accurate information.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center">
-              <div className="bg-primary-100 dark:bg-primary-900 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Truck className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Home Delivery</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Get your car delivered to your doorstep with our premium service.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center">
-              <div className="bg-primary-100 dark:bg-primary-900 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Clock className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Quick Process</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Complete your purchase within days, not weeks, with our streamlined process.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center">
-              <div className="bg-primary-100 dark:bg-primary-900 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <ThumbsUp className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Satisfaction Guarantee</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                7-day money-back guarantee if you're not completely satisfied.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {newestListings.map((car) => (
+              <CarCard key={car.id} car={car} />
+            ))}
           </div>
         </div>
       </section>
 
-            {/* Car Dealers Section */}
+      {/* Featured Dealers Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container">
           <div className="flex justify-between items-center mb-8">
@@ -355,15 +232,15 @@ const Home = () => {
                   <img 
                     src={dealer.imageUrl} 
                     alt={dealer.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{dealer.name}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{dealer.location}</p>
+                  <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">{dealer.name}</h3>
+                  <p className="text-sm mb-3 text-gray-600 dark:text-gray-400">{dealer.location}</p>
                   
-                  <div className="flex items-center mb-3">
-                    <div className="flex text-yellow-400 mr-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex text-yellow-500">
                       {[...Array(5)].map((_, i) => (
                         <svg
                           key={i}
@@ -395,35 +272,143 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Recent Listings */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      {/* Car Brands Section */}
+      <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Newest Listings</h2>
-            <Link to="/cars" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Browse by Brand</h2>
+            <Link to="/cars" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-accent flex items-center gap-2 group">
               <span>View all</span>
-              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-4 w-4 ml-0.5 group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newestListings.map((car) => (
-              <CarCard key={car.id} car={car} />
+          {/* Brand Selection */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            {carBrands.map((brand) => (
+              <motion.div
+                key={brand.id}
+                className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 flex items-center justify-center ${
+                  selectedBrand === brand.id
+                    ? 'bg-primary-100 dark:bg-gray-900 border-blue-600 dark:border-blue-500 shadow-lg'
+                    : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+                onClick={() => setSelectedBrand(brand.id)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <img
+                  src={brand.logoUrl}
+                  alt={`${brand.name} logo`}
+                  className="h-16 w-auto object-contain"
+                />
+              </motion.div>
             ))}
+          </div>
+
+          {/* Selected Brand Cars */}
+          {selectedBrand && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {carBrands.find((b) => b.id === selectedBrand)?.name} Cars
+                </h3>
+                <button
+                  onClick={() => setSelectedBrand(null)}
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 flex items-center gap-1.5 text-sm font-medium"
+                >
+                  <X className="h-4 w-4" />
+                  Clear Selection
+                </button>
+              </div>
+              {brandCars.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {brandCars.map((car) => (
+                    <CarCard key={car.id} car={car} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-lg text-gray-600 dark:text-gray-400">
+                    No cars available for {carBrands.find((b) => b.id === selectedBrand)?.name}.
+                  </p>
+                  <Link
+                    to="/cars"
+                    className="mt-4 inline-block text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-accent font-medium"
+                  >
+                    Browse All Cars
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-16 bg-gray-800 dark:bg-gray-900">
+        <div className="container">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Why Choose Us?</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              We make buying and selling cars simple, transparent, and stress-free with industry-leading features and service.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gray-700 p-4 rounded-lg text-center">
+              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">Verified Listings</h3>
+              <p className="text-gray-400 text-sm">
+                All cars are thoroughly checked for quality and accuracy.
+              </p>
+            </div>
+            <div className="bg-gray-700 p-4 rounded-lg text-center">
+              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                <Truck className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">Home Delivery</h3>
+              <p className="text-gray-400 text-sm">
+                Get your car delivered right to your door.
+              </p>
+            </div>
+            <div className="bg-gray-700 p-4 rounded-lg text-center">
+              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                <Clock className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">Quick Process</h3>
+              <p className="text-gray-400 text-sm">
+                Fast and efficient purchase process to save you time.
+              </p>
+            </div>
+            <div className="bg-gray-700 p-4 rounded-lg text-center">
+              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                <ThumbsUp className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">Satisfaction Guarantee</h3>
+              <p className="text-gray-400 text-sm">
+                7-day money-back guarantee for your peace of mind.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary-600 dark:bg-primary-800">
-        <div className="container text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Sell Your Car?</h2>
-          <p className="text-primary-100 max-w-2xl mx-auto mb-8 text-lg">
+      <section className="py-600 bg-blue-600">
+        <div className="container mx-auto text-center py-16">
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Sell Your Car?</h2>
+          <p className="text-white mb-6 max-w-md mx-auto">
             Get the best price for your vehicle with our free valuation and listing service.
           </p>
-          <Link 
-            to="/sell-car" 
-            className="inline-block px-8 py-4 bg-white text-primary-600 hover:bg-gray-100 font-medium rounded-lg transition-colors shadow-lg"
+          <Link
+            to="/sell-car"
+            className="inline-block px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold"
           >
             List Your Car Today
           </Link>

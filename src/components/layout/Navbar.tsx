@@ -27,8 +27,10 @@ export const Navbar = () => {
     services: {
       label: 'Services',
       links: [
-        { path: '/service-providers', label: 'Auto Services' },
+        { path: '/service-providers', label: 'Services Providers' },
         { path: '/dealerships', label: 'Dealerships' },
+        { path: '/value-asset', label: 'Value Asset' },
+        { path: '/auctions', label: 'Auctions' },
       ]
     },
     safety: {
