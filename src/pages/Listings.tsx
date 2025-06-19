@@ -14,11 +14,18 @@ const sortOptions = [
   { value: 'mileage_low', label: 'Mileage: Low to High' },
 ];
 
+const conditionOptions = [
+  { value: 'used', label: 'Used Cars' },
+  { value: 'new', label: 'New Cars' },
+  { value: 'other', label: 'Others' },
+];
+
 const Listings = () => {
   const [cars, setCars] = useState<CarData[]>(allCars);
   const [filteredCars, setFilteredCars] = useState<CarData[]>(allCars);
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedCondition, setSelectedCondition] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FilterValues>({
     make: '',
     model: '',
@@ -63,9 +70,22 @@ const Listings = () => {
     setCars(sortedCars);
   }, [sortBy, filteredCars]);
 
+  const handleConditionFilter = (condition: string) => {
+    const newCondition = selectedCondition === condition ? '' : condition;
+    setSelectedCondition(newCondition);
+    setCurrentFilters((prev) => ({ ...prev, conditionType: newCondition }));
+    handleSearch({ ...currentFilters, conditionType: newCondition });
+  };
+
   const handleSearch = (filters: FilterValues) => {
     setCurrentFilters(filters);
     let results = [...allCars];
+
+    if (filters.conditionType) {
+      results = results.filter(car => 
+        car.condition.toLowerCase() === filters.conditionType.toLowerCase()
+      );
+    }
 
     if (filters.priceRange) {
       const [min, max] = filters.priceRange.split('-').map(Number);
@@ -137,6 +157,22 @@ const Listings = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-6 flex flex-wrap gap-4">
+          {conditionOptions.map(option => (
+            <button
+              key={option.value}
+              onClick={() => handleConditionFilter(option.value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCondition === option.value
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         <div className="lg:flex">
           <div className="hidden lg:block w-64 flex-shrink-0 mr-8">
             <div className="sticky top-24">
@@ -242,6 +278,7 @@ const Listings = () => {
                       engineSize: '',
                       colour: '',
                     });
+                    setSelectedCondition('');
                     setFilteredCars(allCars);
                   }}
                   className="btn btn-primary"

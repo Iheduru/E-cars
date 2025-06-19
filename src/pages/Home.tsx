@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Truck, Clock, ThumbsUp, AlertTriangle, FileText, Car, X } from 'lucide-react';
+import { ArrowRight, Shield, Truck, Clock, ThumbsUp, AlertTriangle, FileText, Car, X, Star, MapPin, Gavel, Search, Package, DollarSign, Calendar, Tag, CheckCircle, TrendingUp } from 'lucide-react';
 import { CarData, CarCard } from '../components/car/CarCard';
 import { getFeaturedCars } from '../data/cars';
 import SearchFilters from '../components/car/SearchFilters';
 import { featuredDealers } from '../data/dealers';
 import { mockInventory } from '../data/cars';
 import carBrands from '../data/brandData';
+import { mockAuctions, AuctionCar, formatPrice, getTimeRemaining, getAuctionStatus } from '../data/auctions';
+import { CarPart, filterParts, mockCarParts } from '../data/carParts';
+import { mockBlogPosts, BlogPost } from '../data/blog';
 
-// Interface for Dealer (unchanged)
+// Interface for Dealer
 interface Dealer {
   id: string;
   name: string;
@@ -18,6 +21,102 @@ interface Dealer {
   rating: number;
   imageUrl: string;
 }
+
+// Interface for Service Provider
+interface ServiceProvider {
+  id: string;
+  name: string;
+  rating: number;
+  reviews: number;
+  address: string;
+  phone: string;
+  email: string;
+}
+
+// Interface for Stolen Car
+interface StolenCar {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  color: string;
+  licensePlate: string;
+  vin: string;
+  lastSeen: string;
+  dateReported: string;
+  status: string;
+}
+
+// Mock Service Providers data
+const mockServiceProviders: ServiceProvider[] = [
+  {
+    id: '1',
+    name: 'Premium Auto Service',
+    rating: 5,
+    reviews: 128,
+    address: '123 Auto Street, Car City, CC 12345',
+    phone: '(555) 123-4567',
+    email: 'contact@premiumauto.example.com',
+  },
+  {
+    id: '2',
+    name: 'Elite Car Care',
+    rating: 4.5,
+    reviews: 95,
+    address: '456 Motor Avenue, Auto Town, AT 67890',
+    phone: '(555) 987-6543',
+    email: 'info@elitecarcare.example.com',
+  },
+  {
+    id: '3',
+    name: 'Quick Fix Garage',
+    rating: 4,
+    reviews: 76,
+    address: '789 Gear Road, Vehicle City, VC 11223',
+    phone: '(555) 456-7890',
+    email: 'support@quickfixgarage.example.com',
+  },
+];
+
+// Mock Stolen Cars data
+const mockStolenCars: StolenCar[] = [
+  {
+    id: '1',
+    make: 'Toyota',
+    model: 'Camry',
+    year: 2022,
+    color: 'Black',
+    licensePlate: 'ABC-1234',
+    vin: '1HGCM82633A123456',
+    lastSeen: 'Downtown Area, Lagos',
+    dateReported: 'March 15, 2024',
+    status: 'Recently Reported',
+  },
+  {
+    id: '2',
+    make: 'Honda',
+    model: 'Accord',
+    year: 2020,
+    color: 'Silver',
+    licensePlate: 'XYZ-5678',
+    vin: '2HGFC2F69LH123456',
+    lastSeen: 'Victoria Island, Lagos',
+    dateReported: 'February 20, 2024',
+    status: 'Under Investigation',
+  },
+  {
+    id: '3',
+    make: 'Mercedes-Benz',
+    model: 'C-Class',
+    year: 2021,
+    color: 'White',
+    licensePlate: 'LMN-9012',
+    vin: 'WDDGF8AB0MA123456',
+    lastSeen: 'Ikeja, Lagos',
+    dateReported: 'January 10, 2024',
+    status: 'Recovered',
+  },
+];
 
 const Home = () => {
   const [searchParams, setSearchParams] = useState({});
@@ -43,6 +142,74 @@ const Home = () => {
         .flat()
         .filter((car) => car.make.toLowerCase() === selectedBrand.toLowerCase())
     : [];
+
+  // For Auctions, get top 3 auctions sorted by ending soon
+  const featuredAuctions = mockAuctions
+    .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+    .slice(0, 3);
+
+  // For Car Parts, get top 3 parts
+  const featuredParts = filterParts(mockCarParts, {}).slice(0, 3);
+
+  // For Service Providers, get top 3 providers
+  const featuredProviders = mockServiceProviders.slice(0, 3);
+
+  // For Stolen Cars, get top 3 entries
+  const featuredStolenCars = mockStolenCars.slice(0, 3);
+
+  // For Blog Posts, get top 3 posts sorted by date (newest first)
+  const featuredBlogPosts = mockBlogPosts
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
+
+  // Render stars for ratings
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(rating)
+            ? 'fill-yellow-400 text-yellow-400'
+            : 'text-gray-300 dark:text-gray-600'
+        }`}
+      />
+    ));
+  };
+
+  // Get auction status badge
+  const getStatusBadge = (auction: AuctionCar) => {
+    const status = getAuctionStatus(auction);
+    switch (status) {
+      case 'ending-soon':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+            <Clock className="w-3 h-3 mr-1" />
+            Ending Soon
+          </span>
+        );
+      case 'reserve-met':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Reserve Met
+          </span>
+        );
+      case 'no-reserve':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+            <TrendingUp className="w-3 h-3 mr-1" />
+            No Reserve
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+            <Gavel className="w-3 h-3 mr-1" />
+            Active
+          </span>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -272,6 +439,300 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Featured Auctions Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Featured Auctions</h2>
+            <Link to="/auctions" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>See More</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredAuctions.map((auction) => (
+              <Link to={`/auctions/${auction.id}`} key={auction.id}>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <div className="relative">
+                    <img
+                      src={auction.imageUrl}
+                      alt={auction.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute top-4 left-4">
+                      {getStatusBadge(auction)}
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-xl">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2 text-red-400" />
+                            <span className="font-semibold">{getTimeRemaining(auction.endDate)}</span>
+                          </div>
+                          <div className="text-sm text-gray-300">
+                            {auction.bidCount} bids
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{auction.title}</h3>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-2">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span>{auction.location}</span>
+                    </div>
+                    <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                      â�¦{formatPrice(auction.currentBid)}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Service Providers Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Featured Service Providers</h2>
+            <Link to="/service-providers" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>See More</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProviders.map((provider) => (
+              <Link to={`/service-providers/${provider.id}`} key={provider.id}>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {provider.name}
+                    </h3>
+                    <div className="flex items-center mb-4">
+                      <div className="flex">{renderStars(provider.rating)}</div>
+                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                        ({provider.reviews} reviews)
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        <span>{provider.address}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Car Parts Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Featured Car Parts</h2>
+            <Link to="/car-parts" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>See More</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredParts.map((part) => (
+              <Link to={`/car-parts/${part.id}`} key={part.id}>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <img
+                    src={part.imageUrl}
+                    alt={part.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                        {part.category}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {part.condition}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                      {part.title}
+                    </h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                        â�¦{formatPrice(part.price)}
+                      </div>
+                      <div className="flex items-center">
+                        {renderStars(part.seller.rating)}
+                      </div>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {part.location}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Stolen Cars Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Stolen Cars Registry</h2>
+            <Link to="/stolen-cars" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>See More</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredStolenCars.map((car) => (
+              <Link to={`/stolen-cars/${car.id}`} key={car.id}>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {car.year} {car.make} {car.model}
+                      </h3>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        car.status === 'Recently Reported' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                        car.status === 'Under Investigation' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        car.status === 'Recovered' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                      }`}>
+                        {car.status}
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <p><strong>Color:</strong> {car.color}</p>
+                      <p><strong>Last Seen:</strong> {car.lastSeen}</p>
+                      <p><strong>Date Reported:</strong> {car.dateReported}</p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Value Your Asset & Sell Your Car Sections */}
+      <section className="py-16 bg-gray-900">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Value Your Asset Section */}
+            <div className="relative text-white overflow-hidden rounded-2xl">
+              <div className="absolute inset-0 z-0">
+                <img
+                  src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
+                  alt="Car valuation appraisal"
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/30"></div>
+              </div>
+              <div className="relative z-10 p-8 text-center">
+                <h2 className="text-3xl font-bold mb-4">We know what your car is really worth</h2>
+                <p className="text-lg mb-8">
+                  Join the millions who value their car with Autotrader. It's completely free and within seconds we will give you a live valuation of what your car is worth.
+                </p>
+                <Link
+                  to="/value-asset"
+                  className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold shadow-lg"
+                >
+                  Value your car
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Sell Your Car Section */}
+            <div className="relative text-white overflow-hidden rounded-2xl">
+              <div className="absolute inset-0 z-0">
+                <img
+                  src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
+                  alt="Car for sale"
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/30"></div>
+              </div>
+              <div className="relative z-10 p-8 text-center">
+                <h2 className="text-3xl font-bold mb-4">Sell Your Car Today</h2>
+                <p className="text-lg mb-8">
+                  List your vehicle quickly and easily on our platform. Reach thousands of potential buyers and get the best price for your car.
+                </p>
+                <Link
+                  to="/sell-car"
+                  className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold shadow-lg"
+                >
+                  Start Selling
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Blog Posts Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Latest Automotive Insights</h2>
+            <Link to="/blog" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center group">
+              <span>See More</span>
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredBlogPosts.map((post: BlogPost) => (
+              <Link
+                to={`/blog/${post.slug}`}
+                key={post.id}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
+              >
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-6">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <Tag className="w-4 h-4 mr-1" />
+                    {post.category}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    {new Date(post.date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Car Brands Section */}
       <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container">
@@ -369,7 +830,7 @@ const Home = () => {
               </p>
             </div>
             <div className="bg-gray-700 p-4 rounded-lg text-center">
-              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-                mb-4">
                 <Truck className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-white mb-1">Home Delivery</h3>
@@ -377,22 +838,22 @@ const Home = () => {
                 Get your car delivered right to your door.
               </p>
             </div>
-            <div className="bg-gray-700 p-4 rounded-lg text-center">
-              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Clock className="h-6 w-6 text-blue-600" />
+            <div className="bg-gray-700 p-3 rounded-xl text-center">
+              <div className="bg-white/10 p-3 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-3">
+                <Clock className="h-6 w-6 text-blue-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-1">Quick Process</h3>
-              <p className="text-gray-400 text-sm">
-                Fast and efficient purchase process to save you time.
+              <h3 className="text-lg font-semibold text-white mb-2">Quick Process</h3>
+              <p className="text-sm text-gray-300">
+                Streamlined buying and selling to save time.
               </p>
             </div>
-            <div className="bg-gray-700 p-4 rounded-lg text-center">
-              <div className="bg-primary-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+            <div className="bg-gray-600 p-4 rounded-lg text-center">
+              <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                 <ThumbsUp className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-1">Satisfaction Guarantee</h3>
-              <p className="text-gray-400 text-sm">
-                7-day money-back guarantee for your peace of mind.
+              <h3 className="text-lg font-bold text-white mb-1">Customer Satisfaction</h3>
+              <p className="text-gray-300 text-sm">
+                We prioritize your peace of mind.
               </p>
             </div>
           </div>
@@ -400,17 +861,18 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-600 bg-blue-600">
-        <div className="container mx-auto text-center py-16">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Sell Your Car?</h2>
-          <p className="text-white mb-6 max-w-md mx-auto">
-            Get the best price for your vehicle with our free valuation and listing service.
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Car?</h2>
+          <p className="text-lg mb-6 max-w-md mx-auto">
+            Explore thousands of vehicles and get expert insights to guide your journey.
           </p>
           <Link
-            to="/sell-car"
-            className="inline-block px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold"
+            to="/cars"
+            className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-200"
           >
-            List Your Car Today
+            Browse Now
+            <ArrowRight className="h-4 w-4 ml-1" />
           </Link>
         </div>
       </section>
