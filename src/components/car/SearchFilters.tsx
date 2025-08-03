@@ -204,6 +204,14 @@ const colourOptions: FilterOption[] = [
   { value: 'grey', label: 'Grey' },
 ];
 
+const vehicleOptions: FilterOption[] = [
+  { value: '', label: 'Any Vehicle Type' },
+  { value: 'car', label: 'Car' },
+  { value: 'motorcycle', label: 'Motorcycle' },
+  { value: 'truck', label: 'Truck' },
+  { value: 'bus', label: 'Bus' },
+];
+
 interface SearchFiltersProps {
   variant?: 'hero' | 'sidebar';
   className?: string;
@@ -228,6 +236,7 @@ export interface SearchFilters {
   doors: string;
   engineSize: string;
   colour: string;
+  vehicleType: string;
 }
 
 const SearchFilters = ({ 
@@ -253,6 +262,7 @@ const SearchFilters = ({
     doors: '',
     engineSize: '',
     colour: '',
+    vehicleType: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -288,6 +298,7 @@ const SearchFilters = ({
       doors: '',
       engineSize: '',
       colour: '',
+      vehicleType: '',
     });
   };
 
@@ -317,6 +328,28 @@ const SearchFilters = ({
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1 min-w-[180px] w-full">
+              <label htmlFor="vehicleType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+               Vehicle Type
+              </label>
+              <div className="relative">
+                <select
+                  id="vehicleType"
+                  name="vehicleType"
+                  value={filters.vehicleType}
+                  onChange={handleChange}
+                  className="w-full h-12 pl-4 pr-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none hover:border-gray-400 dark:hover:border-gray-500"
+                >
+                  {vehicleOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
             <div className="flex-1 min-w-[180px] w-full">
               <label htmlFor="make" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Make

@@ -19,7 +19,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
               <Car className="h-8 w-8 text-primary-600 dark:text-primary-500" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">eCars</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">E-Cars</span>
             </Link>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               The premier marketplace for buying and selling cars online. Find your dream car or sell your vehicle with ease.

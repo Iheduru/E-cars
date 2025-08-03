@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   MapPin, 
@@ -19,6 +19,7 @@ import { Dealer, featuredDealers } from '../data/dealers';
 
 const CarDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Find the car with matching ID across all dealer inventories
   let car: CarData | undefined;
@@ -55,6 +56,11 @@ const CarDetails = () => {
         }`}
       />
     ));
+  };
+
+  // Toggle modal visibility
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   if (!car) {
@@ -222,6 +228,12 @@ const CarDetails = () => {
                   <button className="w-full border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 py-4 px-6 rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                     Get Financing
                   </button>
+                  <button 
+                    onClick={toggleModal}
+                    className="w-full border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 py-4 px-6 rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                  >
+                    Reserve Now
+                  </button>
                 </div>
 
                 {/* Dealer Information */}
@@ -275,6 +287,34 @@ const CarDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Reservation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Reservation Information</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Reservations last for only <span className="font-semibold">30 days</span> before they expire. 
+              To make a reservation, a payment of <span className="font-semibold">30-50%</span> of the vehicle price must be made. 
+              <span className="font-semibold">Terms and conditions</span> apply based on the seller.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={toggleModal}
+                className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={toggleModal}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors"
+              >
+                Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

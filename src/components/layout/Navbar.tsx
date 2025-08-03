@@ -47,7 +47,13 @@ export const Navbar = () => {
         { path: '/about', label: 'About' },
         { path: '/contact', label: 'Contact' },
       ]
-    }
+    },
+      vehicle: {
+      label: 'Vehicles',
+      links: [
+        { path: '/vehicles', label: 'Vehicles' },
+      ]
+    },
   };
 
   // Check if the current route is the home page
@@ -91,7 +97,7 @@ export const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Car className="h-8 w-8 text-primary-600 dark:text-primary-500" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">eCars</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">E-Cars</span>
           </Link>
 
           {/* Desktop Navigation */}

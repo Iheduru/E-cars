@@ -11,6 +11,7 @@ import carBrands from '../data/brandData';
 import { mockAuctions, AuctionCar, formatPrice, getTimeRemaining, getAuctionStatus } from '../data/auctions';
 import { CarPart, filterParts, mockCarParts } from '../data/carParts';
 import { mockBlogPosts, BlogPost } from '../data/blog';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Interface for Dealer
 interface Dealer {
@@ -121,6 +122,8 @@ const mockStolenCars: StolenCar[] = [
 const Home = () => {
   const [searchParams, setSearchParams] = useState({});
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+
+    const { theme } = useTheme(); // Get the current theme
 
   const handleSearch = (filters: any) => {
     setSearchParams(filters);
@@ -362,6 +365,65 @@ const Home = () => {
         </div>
       </section>
 
+{/* Value Your Asset & Sell Your Car Sections */}
+<section className="py-16 bg-gray-50 dark:bg-gray-900">
+  <div className="container">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Value Your Asset Section */}
+      <div className="relative text-white overflow-hidden rounded-2xl">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
+            alt="Car valuation appraisal"
+            className="w-full h-full object-cover object-center"
+            loading="lazy"
+          />
+          <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'dark' ? 'from-gray-800/70 to-gray-800/30' : 'from-gray-900/70 to-gray-900/30'}`}></div>
+        </div>
+        <div className="relative z-10 p-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">We know what your car is really worth</h2>
+          <p className="text-lg mb-8">
+            Join the millions who value their car with Autotrader. It's completely free and within seconds we will give you a live valuation of what your car is worth.
+          </p>
+          <Link
+            to="/value-asset"
+            className={`inline-flex items-center px-6 py-3 ${theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-white text-indigo-600 hover:bg-gray-100'} rounded-lg transition-colors duration-200 font-semibold shadow-lg`}
+          >
+            Value your car
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Sell Your Car Section */}
+      <div className="relative text-white overflow-hidden rounded-2xl">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
+            alt="Car for sale"
+            className="w-full h-full object-cover object-center"
+            loading="lazy"
+          />
+          <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'dark' ? 'from-gray-800/70 to-gray-800/30' : 'from-gray-900/70 to-gray-900/30'}`}></div>
+        </div>
+        <div className="relative z-10 p-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Sell Your Car Today</h2>
+          <p className="text-lg mb-8">
+            List your vehicle quickly and easily on our platform. Reach thousands of potential buyers and get the best price for your car.
+          </p>
+          <Link
+            to="/sell-car"
+            className={`inline-flex items-center px-6 py-3 ${theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-white text-indigo-600 hover:bg-gray-100'} rounded-lg transition-colors duration-200 font-semibold shadow-lg`}
+          >
+            Start Selling
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
       {/* Recent Listings */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container">
@@ -484,7 +546,7 @@ const Home = () => {
                       <span>{auction.location}</span>
                     </div>
                     <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                      â�¦{formatPrice(auction.currentBid)}
+                      ₦{formatPrice(auction.currentBid)}
                     </div>
                   </div>
                 </div>
@@ -567,7 +629,7 @@ const Home = () => {
                     </h3>
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                        â�¦{formatPrice(part.price)}
+                        ₦{formatPrice(part.price)}
                       </div>
                       <div className="flex items-center">
                         {renderStars(part.seller.rating)}
@@ -623,63 +685,6 @@ const Home = () => {
                 </div>
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Value Your Asset & Sell Your Car Sections */}
-      <section className="py-16 bg-gray-900">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Value Your Asset Section */}
-            <div className="relative text-white overflow-hidden rounded-2xl">
-              <div className="absolute inset-0 z-0">
-                <img
-                  src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
-                  alt="Car valuation appraisal"
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/30"></div>
-              </div>
-              <div className="relative z-10 p-8 text-center">
-                <h2 className="text-3xl font-bold mb-4">We know what your car is really worth</h2>
-                <p className="text-lg mb-8">
-                  Join the millions who value their car with Autotrader. It's completely free and within seconds we will give you a live valuation of what your car is worth.
-                </p>
-                <Link
-                  to="/value-asset"
-                  className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold shadow-lg"
-                >
-                  Value your car
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Sell Your Car Section */}
-            <div className="relative text-white overflow-hidden rounded-2xl">
-              <div className="absolute inset-0 z-0">
-                <img
-                  src="https://images.unsplash.com/photo-1592853625597-7d17be820d0c?auto=format&fit=crop&w=1920&q=80"
-                  alt="Car for sale"
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/30"></div>
-              </div>
-              <div className="relative z-10 p-8 text-center">
-                <h2 className="text-3xl font-bold mb-4">Sell Your Car Today</h2>
-                <p className="text-lg mb-8">
-                  List your vehicle quickly and easily on our platform. Reach thousands of potential buyers and get the best price for your car.
-                </p>
-                <Link
-                  to="/sell-car"
-                  className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-semibold shadow-lg"
-                >
-                  Start Selling
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </section>

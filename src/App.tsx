@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { PrivateRoute } from './components/auth/PrivateRoute';
 import DashboardLayout from './components/dashboard/DashboardLayout';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Pages
 import Home from './pages/Home';
@@ -38,6 +39,8 @@ import DealerDetails from './pages/DealerDetails';
 import ValueAsset from './pages/ValueAsset';
 import Auctions from './pages/Auctions';
 import AuctionDetails from './pages/AuctionDetails';
+import Vehicles from './pages/Vehicles';
+import VehicleDetails from './pages/VehicleDetails';
 
 function App() {
   const location = useLocation();
@@ -47,8 +50,10 @@ function App() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  return (
+  return ( 
+      <ThemeProvider>
     <Routes>
+   
       <Route path="/" element={<Layout />}>
         {/* Public Routes */}
         <Route index element={<Home />} />
@@ -71,6 +76,10 @@ function App() {
         <Route path="/value-asset" element={<ValueAsset />} />
         <Route path="/auctions" element={<Auctions />} />
         <Route path="auctions/:id" element={<AuctionDetails />} />
+        <Route path="vehicles" element={<Vehicles />} />
+        <Route path="/vehicles/:id" element={<VehicleDetails />} />
+
+        {/* Dashboard and Admin Routes */}
         
         {/* Dashboard and User Routes */}
 
@@ -97,7 +106,9 @@ function App() {
         {/* Catch-all route */}
         <Route path="*" element={<NotFound />} />
       </Route>
+          
     </Routes>
+    </ThemeProvider>
   );
 }
 
